@@ -1,0 +1,676 @@
+
+Importing Libraries
+In [1]:
+import os
+import seaborn as sns
+color=sns.color_palette()
+sns.set_style('darkgrid')
+
+import pandas as pd
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np
+
+import warnings
+def ignore_warn(*args, **kwargs):
+    pass
+warnings.warn =ignore_warn #warnings from sklearn and seaborn
+In [2]:
+df_train=pd.read_csv("AdvWorksCusts.csv")
+ave_spend=pd.read_csv("AW_AveMonthSpend.csv")
+bike_buyer=pd.read_csv('AW_BikeBuyer.csv')
+df_test=pd.read_csv('AW_test.csv')
+In [3]:
+df_train.head(5).T
+Out[3]:
+0	1	2	3	4
+CustomerID	11000	11001	11002	11003	11004
+Title	NaN	NaN	NaN	NaN	NaN
+FirstName	Jon	Eugene	Ruben	Christy	Elizabeth
+MiddleName	V	L	NaN	NaN	NaN
+LastName	Yang	Huang	Torres	Zhu	Johnson
+Suffix	NaN	NaN	NaN	NaN	NaN
+AddressLine1	3761 N. 14th St	2243 W St.	5844 Linden Land	1825 Village Pl.	7553 Harness Circle
+AddressLine2	NaN	NaN	NaN	NaN	NaN
+City	Rockhampton	Seaford	Hobart	North Ryde	Wollongong
+StateProvinceName	Queensland	Victoria	Tasmania	New South Wales	New South Wales
+CountryRegionName	Australia	Australia	Australia	Australia	Australia
+PostalCode	4700	3198	7001	2113	2500
+PhoneNumber	1 (11) 500 555-0162	1 (11) 500 555-0110	1 (11) 500 555-0184	1 (11) 500 555-0162	1 (11) 500 555-0131
+BirthDate	1966-04-08	1965-05-14	1965-08-12	1968-02-15	1968-08-08
+Education	Bachelors	Bachelors	Bachelors	Bachelors	Bachelors
+Occupation	Professional	Professional	Professional	Professional	Professional
+Gender	M	M	M	F	F
+MaritalStatus	M	S	M	S	S
+HomeOwnerFlag	1	0	1	0	1
+NumberCarsOwned	0	1	1	1	4
+NumberChildrenAtHome	0	3	3	0	5
+TotalChildren	2	3	3	0	5
+YearlyIncome	137947	101141	91945	86688	92771
+In [4]:
+ave_spend.head(5).T
+Out[4]:
+0	1	2	3	4
+CustomerID	11000	11001	11002	11003	11004
+AveMonthSpend	89	117	123	50	95
+In [5]:
+ave_spend.shape
+Out[5]:
+(16519, 2)
+In [6]:
+bike_buyer.head(5).T
+Out[6]:
+0	1	2	3	4
+CustomerID	11000	11001	11002	11003	11004
+BikeBuyer	0	1	0	0	1
+In [7]:
+bike_buyer.shape
+Out[7]:
+(16519, 2)
+In [8]:
+df_test.head(5).T
+Out[8]:
+0	1	2	3	4
+CustomerID	18988	29135	12156	13749	27780
+Title	NaN	NaN	NaN	NaN	NaN
+FirstName	Courtney	Adam	Bonnie	Julio	Christy
+MiddleName	A	C	NaN	C	A
+LastName	Baker	Allen	Raji	Alonso	Andersen
+Suffix	NaN	NaN	NaN	NaN	NaN
+AddressLine1	8727 Buena Vista Ave.	3491 Cook Street	359 Pleasant Hill Rd	8945 Euclid Ave.	42, boulevard Tremblay
+AddressLine2	NaN	NaN	NaN	NaN	NaN
+City	Fremont	Haney	Burbank	Burlingame	Dunkerque
+StateProvinceName	California	British Columbia	California	California	Nord
+CountryRegionName	United States	Canada	United States	United States	France
+PostalCode	94536	V2W 1W2	91502	94010	59140
+PhoneNumber	133-555-0128	252-555-0173	409-555-0193	175-555-0196	1 (11) 500 555-0122
+BirthDate	1/5/1945	10/4/1964	1/12/1934	9/22/1958	3/19/1965
+Education	Bachelors	Bachelors	Graduate Degree	Graduate Degree	High School
+Occupation	Management	Skilled Manual	Management	Skilled Manual	Manual
+Gender	F	M	F	M	F
+MaritalStatus	S	M	M	M	M
+HomeOwnerFlag	0	1	1	1	1
+NumberCarsOwned	2	2	2	0	1
+NumberChildrenAtHome	0	2	0	0	2
+TotalChildren	5	4	4	4	2
+YearlyIncome	86931	100125	103985	127161	21876
+In [9]:
+print('Shape before merging Data:', df_train.shape)
+df_train=pd.merge(df_train,bike_buyer,how='inner', on='CustomerID')
+print('Shape After merging Data:', df_train.shape)
+Shape before merging Data: (16519, 23)
+Shape After merging Data: (16749, 24)
+In [10]:
+print('Shape before dropping duplicates', df_train.shape)
+df_train.drop_duplicates(subset='CustomerID', keep='last')
+print('Shape after dropping duplicates', df_train.shape)
+Shape before dropping duplicates (16749, 24)
+Shape after dropping duplicates (16749, 24)
+In [11]:
+df_train.head(5).T
+Out[11]:
+0	1	2	3	4
+CustomerID	11000	11001	11002	11003	11004
+Title	NaN	NaN	NaN	NaN	NaN
+FirstName	Jon	Eugene	Ruben	Christy	Elizabeth
+MiddleName	V	L	NaN	NaN	NaN
+LastName	Yang	Huang	Torres	Zhu	Johnson
+Suffix	NaN	NaN	NaN	NaN	NaN
+AddressLine1	3761 N. 14th St	2243 W St.	5844 Linden Land	1825 Village Pl.	7553 Harness Circle
+AddressLine2	NaN	NaN	NaN	NaN	NaN
+City	Rockhampton	Seaford	Hobart	North Ryde	Wollongong
+StateProvinceName	Queensland	Victoria	Tasmania	New South Wales	New South Wales
+CountryRegionName	Australia	Australia	Australia	Australia	Australia
+PostalCode	4700	3198	7001	2113	2500
+PhoneNumber	1 (11) 500 555-0162	1 (11) 500 555-0110	1 (11) 500 555-0184	1 (11) 500 555-0162	1 (11) 500 555-0131
+BirthDate	1966-04-08	1965-05-14	1965-08-12	1968-02-15	1968-08-08
+Education	Bachelors	Bachelors	Bachelors	Bachelors	Bachelors
+Occupation	Professional	Professional	Professional	Professional	Professional
+Gender	M	M	M	F	F
+MaritalStatus	M	S	M	S	S
+HomeOwnerFlag	1	0	1	0	1
+NumberCarsOwned	0	1	1	1	4
+NumberChildrenAtHome	0	3	3	0	5
+TotalChildren	2	3	3	0	5
+YearlyIncome	137947	101141	91945	86688	92771
+BikeBuyer	0	1	0	0	1
+In [12]:
+df_train.describe()
+Out[12]:
+CustomerID	HomeOwnerFlag	NumberCarsOwned	NumberChildrenAtHome	TotalChildren	YearlyIncome	BikeBuyer
+count	16749.000000	16749.000000	16749.000000	16749.000000	16749.000000	16749.000000	16749.000000
+mean	20222.633112	0.673473	1.503433	0.993791	2.009613	78109.602185	0.332020
+std	5346.696692	0.468957	1.138620	1.516555	1.683549	39678.696234	0.470952
+min	11000.000000	0.000000	0.000000	0.000000	0.000000	9482.000000	0.000000
+25%	15580.000000	0.000000	1.000000	0.000000	0.000000	47787.000000	0.000000
+50%	20200.000000	1.000000	2.000000	0.000000	2.000000	76120.000000	0.000000
+75%	24857.000000	1.000000	2.000000	2.000000	3.000000	105179.000000	1.000000
+max	29482.000000	1.000000	4.000000	5.000000	5.000000	196511.000000	1.000000
+In [13]:
+#Heat map
+corrmat= df_train.corr()
+f, ax =plt.subplots(figsize=(5,4))
+sns.heatmap(corrmat, square=True)
+Out[13]:
+<matplotlib.axes._subplots.AxesSubplot at 0x26d5f0d4828>
+
+In [14]:
+sns.distplot(bike_buyer['BikeBuyer'])
+\site-packages\scipy\stats\stats.py:1713: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  return np.add.reduce(sorted[indexer] * weights, axis=axis) / sumval
+Out[14]:
+<matplotlib.axes._subplots.AxesSubplot at 0x26d5f212390>
+
+In [15]:
+df_train.describe(include=[np.object, pd.Categorical]).T
+Out[15]:
+count	unique	top	freq
+Title	88	5	Mr.	43
+FirstName	16749	662	Isabella	91
+MiddleName	9696	44	L	1178
+LastName	16749	363	Diaz	193
+Suffix	2	1	Jr.	2
+AddressLine1	16749	11879	Attaché de Presse	18
+AddressLine2	281	154	Verkaufsabteilung	28
+City	16749	270	London	379
+StateProvinceName	16749	52	California	4023
+CountryRegionName	16749	6	United States	7088
+PostalCode	16749	324	91910	191
+PhoneNumber	16749	7949	1 (11) 500 555-0118	187
+BirthDate	16749	7896	1957-02-26	11
+Education	16749	5	Bachelors	4860
+Occupation	16749	5	Professional	5045
+Gender	16749	2	M	8473
+MaritalStatus	16749	2	M	9047
+In [16]:
+df_train['Occupation'].value_counts()
+Out[16]:
+Professional      5045
+Skilled Manual    4119
+Management        2766
+Clerical          2663
+Manual            2156
+Name: Occupation, dtype: int64
+Obtaining the median for the features in the Occupation column
+
+In [17]:
+df_train["BirthDate"]=pd.to_datetime(df_train['BirthDate'], infer_datetime_format=True)
+df_train['year']=df_train['BirthDate'].dt.year
+In [18]:
+df_train['Age']=1998-df_train['year']
+df_train.head(5).T
+Out[18]:
+0	1	2	3	4
+CustomerID	11000	11001	11002	11003	11004
+Title	NaN	NaN	NaN	NaN	NaN
+FirstName	Jon	Eugene	Ruben	Christy	Elizabeth
+MiddleName	V	L	NaN	NaN	NaN
+LastName	Yang	Huang	Torres	Zhu	Johnson
+Suffix	NaN	NaN	NaN	NaN	NaN
+AddressLine1	3761 N. 14th St	2243 W St.	5844 Linden Land	1825 Village Pl.	7553 Harness Circle
+AddressLine2	NaN	NaN	NaN	NaN	NaN
+City	Rockhampton	Seaford	Hobart	North Ryde	Wollongong
+StateProvinceName	Queensland	Victoria	Tasmania	New South Wales	New South Wales
+CountryRegionName	Australia	Australia	Australia	Australia	Australia
+PostalCode	4700	3198	7001	2113	2500
+PhoneNumber	1 (11) 500 555-0162	1 (11) 500 555-0110	1 (11) 500 555-0184	1 (11) 500 555-0162	1 (11) 500 555-0131
+BirthDate	1966-04-08 00:00:00	1965-05-14 00:00:00	1965-08-12 00:00:00	1968-02-15 00:00:00	1968-08-08 00:00:00
+Education	Bachelors	Bachelors	Bachelors	Bachelors	Bachelors
+Occupation	Professional	Professional	Professional	Professional	Professional
+Gender	M	M	M	F	F
+MaritalStatus	M	S	M	S	S
+HomeOwnerFlag	1	0	1	0	1
+NumberCarsOwned	0	1	1	1	4
+NumberChildrenAtHome	0	3	3	0	5
+TotalChildren	2	3	3	0	5
+YearlyIncome	137947	101141	91945	86688	92771
+BikeBuyer	0	1	0	0	1
+year	1966	1965	1965	1968	1968
+Age	32	33	33	30	30
+In [19]:
+df_test["BirthDate"]=pd.to_datetime(df_test['BirthDate'], infer_datetime_format=True)
+df_test['year']=df_test['BirthDate'].dt.year
+df_test['Age']=1998-df_test['year']
+df_test.head(5).T
+Out[19]:
+0	1	2	3	4
+CustomerID	18988	29135	12156	13749	27780
+Title	NaN	NaN	NaN	NaN	NaN
+FirstName	Courtney	Adam	Bonnie	Julio	Christy
+MiddleName	A	C	NaN	C	A
+LastName	Baker	Allen	Raji	Alonso	Andersen
+Suffix	NaN	NaN	NaN	NaN	NaN
+AddressLine1	8727 Buena Vista Ave.	3491 Cook Street	359 Pleasant Hill Rd	8945 Euclid Ave.	42, boulevard Tremblay
+AddressLine2	NaN	NaN	NaN	NaN	NaN
+City	Fremont	Haney	Burbank	Burlingame	Dunkerque
+StateProvinceName	California	British Columbia	California	California	Nord
+CountryRegionName	United States	Canada	United States	United States	France
+PostalCode	94536	V2W 1W2	91502	94010	59140
+PhoneNumber	133-555-0128	252-555-0173	409-555-0193	175-555-0196	1 (11) 500 555-0122
+BirthDate	1945-01-05 00:00:00	1964-10-04 00:00:00	1934-01-12 00:00:00	1958-09-22 00:00:00	1965-03-19 00:00:00
+Education	Bachelors	Bachelors	Graduate Degree	Graduate Degree	High School
+Occupation	Management	Skilled Manual	Management	Skilled Manual	Manual
+Gender	F	M	F	M	F
+MaritalStatus	S	M	M	M	M
+HomeOwnerFlag	0	1	1	1	1
+NumberCarsOwned	2	2	2	0	1
+NumberChildrenAtHome	0	2	0	0	2
+TotalChildren	5	4	4	4	2
+YearlyIncome	86931	100125	103985	127161	21876
+year	1945	1964	1934	1958	1965
+Age	53	34	64	40	33
+In [20]:
+cars={0:'No cars', 1:'>1 cars', 2:'>1 cars', 3:'>3 cars', 4:'>3 cars'}
+dataset=[df_train, df_test]
+for data in dataset:
+    data['NumberCarsOwned']=data['NumberCarsOwned'].replace(cars)
+In [21]:
+children={0:'No Children', 1:'More than 1', 2:'More than 1', 3:'More than 1', 4:'More than 1', 5:'More than 1'}
+dataset=[df_train, df_test]
+for data in dataset:
+    data['NumberChildrenAtHome']=data['NumberChildrenAtHome'].replace(children)
+In [22]:
+df_train.head(5)
+Out[22]:
+CustomerID	Title	FirstName	MiddleName	LastName	Suffix	AddressLine1	AddressLine2	City	StateProvinceName	...	Gender	MaritalStatus	HomeOwnerFlag	NumberCarsOwned	NumberChildrenAtHome	TotalChildren	YearlyIncome	BikeBuyer	year	Age
+0	11000	NaN	Jon	V	Yang	NaN	3761 N. 14th St	NaN	Rockhampton	Queensland	...	M	M	1	No cars	No Children	2	137947	0	1966	32
+1	11001	NaN	Eugene	L	Huang	NaN	2243 W St.	NaN	Seaford	Victoria	...	M	S	0	>1 cars	More than 1	3	101141	1	1965	33
+2	11002	NaN	Ruben	NaN	Torres	NaN	5844 Linden Land	NaN	Hobart	Tasmania	...	M	M	1	>1 cars	More than 1	3	91945	0	1965	33
+3	11003	NaN	Christy	NaN	Zhu	NaN	1825 Village Pl.	NaN	North Ryde	New South Wales	...	F	S	0	>1 cars	No Children	0	86688	0	1968	30
+4	11004	NaN	Elizabeth	NaN	Johnson	NaN	7553 Harness Circle	NaN	Wollongong	New South Wales	...	F	S	1	>3 cars	More than 1	5	92771	1	1968	30
+5 rows × 26 columns
+
+In [23]:
+dataset=[df_train, df_test]
+for data in dataset:
+    del data['year']
+In [24]:
+df_train.columns
+Out[24]:
+Index(['CustomerID', 'Title', 'FirstName', 'MiddleName', 'LastName', 'Suffix',
+       'AddressLine1', 'AddressLine2', 'City', 'StateProvinceName',
+       'CountryRegionName', 'PostalCode', 'PhoneNumber', 'BirthDate',
+       'Education', 'Occupation', 'Gender', 'MaritalStatus', 'HomeOwnerFlag',
+       'NumberCarsOwned', 'NumberChildrenAtHome', 'TotalChildren',
+       'YearlyIncome', 'BikeBuyer', 'Age'],
+      dtype='object')
+In [25]:
+child={0:'No Children', 1:'More than 1', 2:'More than 1', 3:'More than 1', 4:'More than 1', 5:'More than 1'}
+dataset=[df_train, df_test]
+for data in dataset:
+    data['TotalChildren']=data['TotalChildren'].replace(child)
+In [26]:
+columns=['CustomerID','CountryRegionName', 'Education', 'Occupation', 'Gender', 'MaritalStatus', 
+         'HomeOwnerFlag', 'NumberCarsOwned', 'NumberChildrenAtHome', 'TotalChildren', 'YearlyIncome','BikeBuyer', 'Age']
+train=df_train[columns]
+
+cols=['CustomerID','CountryRegionName', 'Education', 'Occupation', 'Gender', 'MaritalStatus', 
+      'HomeOwnerFlag', 'NumberCarsOwned', 'NumberChildrenAtHome', 'TotalChildren', 'YearlyIncome', 'Age']
+test=df_test[cols]
+In [27]:
+test.head(5)
+Out[27]:
+CustomerID	CountryRegionName	Education	Occupation	Gender	MaritalStatus	HomeOwnerFlag	NumberCarsOwned	NumberChildrenAtHome	TotalChildren	YearlyIncome	Age
+0	18988	United States	Bachelors	Management	F	S	0	>1 cars	No Children	More than 1	86931	53
+1	29135	Canada	Bachelors	Skilled Manual	M	M	1	>1 cars	More than 1	More than 1	100125	34
+2	12156	United States	Graduate Degree	Management	F	M	1	>1 cars	No Children	More than 1	103985	64
+3	13749	United States	Graduate Degree	Skilled Manual	M	M	1	No cars	No Children	More than 1	127161	40
+4	27780	France	High School	Manual	F	M	1	>1 cars	More than 1	More than 1	21876	33
+In [28]:
+train.head(5)
+Out[28]:
+CustomerID	CountryRegionName	Education	Occupation	Gender	MaritalStatus	HomeOwnerFlag	NumberCarsOwned	NumberChildrenAtHome	TotalChildren	YearlyIncome	BikeBuyer	Age
+0	11000	Australia	Bachelors	Professional	M	M	1	No cars	No Children	More than 1	137947	0	32
+1	11001	Australia	Bachelors	Professional	M	S	0	>1 cars	More than 1	More than 1	101141	1	33
+2	11002	Australia	Bachelors	Professional	M	M	1	>1 cars	More than 1	More than 1	91945	0	33
+3	11003	Australia	Bachelors	Professional	F	S	0	>1 cars	No Children	No Children	86688	0	30
+4	11004	Australia	Bachelors	Professional	F	S	1	>3 cars	More than 1	More than 1	92771	1	30
+In [29]:
+train.shape
+Out[29]:
+(16749, 13)
+Observing Data to perform Data Transformation
+
+In [30]:
+column=['YearlyIncome', 'Age']
+def distplot(df, column, bins = 10, hist = False):
+    for col in column:
+        sns.distplot(df[col], bins=bins, rug=True, hist=hist)
+        plt.title('Distribution for' + col)
+        plt.xlabel(col)
+        plt.ylabel('Frequency')
+        plt.show()
+
+distplot(train, column, hist= True)
+
+
+In [31]:
+train['Age']=np.log(train['Age'])
+train['YearlyIncome']=(train['YearlyIncome'])**0.5
+In [32]:
+test['Age']=np.log(test['Age'])
+test['YearlyIncome']=(test['YearlyIncome'])**0.5
+In [33]:
+train.head()
+Out[33]:
+CustomerID	CountryRegionName	Education	Occupation	Gender	MaritalStatus	HomeOwnerFlag	NumberCarsOwned	NumberChildrenAtHome	TotalChildren	YearlyIncome	BikeBuyer	Age
+0	11000	Australia	Bachelors	Professional	M	M	1	No cars	No Children	More than 1	371.412170	0	3.465736
+1	11001	Australia	Bachelors	Professional	M	S	0	>1 cars	More than 1	More than 1	318.026728	1	3.496508
+2	11002	Australia	Bachelors	Professional	M	M	1	>1 cars	More than 1	More than 1	303.224339	0	3.496508
+3	11003	Australia	Bachelors	Professional	F	S	0	>1 cars	No Children	No Children	294.428260	0	3.401197
+4	11004	Australia	Bachelors	Professional	F	S	1	>3 cars	More than 1	More than 1	304.583322	1	3.401197
+The only feature that is not close to normal distribution is the AveMonthSpend, and it is the Target variable
+
+In [34]:
+train['CountryRegionName'].value_counts()
+Out[34]:
+United States     7088
+Australia         3263
+United Kingdom    1727
+France            1624
+Germany           1610
+Canada            1437
+Name: CountryRegionName, dtype: int64
+In [35]:
+test['CountryRegionName'].value_counts()
+Out[35]:
+United States     225
+Australia          86
+Canada             49
+Germany            49
+France             47
+United Kingdom     44
+Name: CountryRegionName, dtype: int64
+In [36]:
+col=['CountryRegionName', 'Education', 'Occupation', 'Gender', 'MaritalStatus','NumberCarsOwned', 
+        'NumberChildrenAtHome','TotalChildren']
+train=pd.get_dummies(train, prefix=col, columns=col)
+test=pd.get_dummies(test, prefix=col, columns=col)
+In [37]:
+train.columns
+Out[37]:
+Index(['CustomerID', 'HomeOwnerFlag', 'YearlyIncome', 'BikeBuyer', 'Age',
+       'CountryRegionName_Australia', 'CountryRegionName_Canada',
+       'CountryRegionName_France', 'CountryRegionName_Germany',
+       'CountryRegionName_United Kingdom', 'CountryRegionName_United States',
+       'Education_Bachelors ', 'Education_Graduate Degree',
+       'Education_High School', 'Education_Partial College',
+       'Education_Partial High School', 'Occupation_Clerical',
+       'Occupation_Management', 'Occupation_Manual', 'Occupation_Professional',
+       'Occupation_Skilled Manual', 'Gender_F', 'Gender_M', 'MaritalStatus_M',
+       'MaritalStatus_S', 'NumberCarsOwned_>1 cars', 'NumberCarsOwned_>3 cars',
+       'NumberCarsOwned_No cars', 'NumberChildrenAtHome_More than 1',
+       'NumberChildrenAtHome_No Children', 'TotalChildren_More than 1',
+       'TotalChildren_No Children'],
+      dtype='object')
+In [38]:
+print('Shape of train', train.shape)
+print('Shape of test', test.shape)
+Shape of train (16749, 32)
+Shape of test (500, 31)
+In [39]:
+f,ax=plt.subplots(figsize=(18,15))
+sns.heatmap(train.corr(),linewidth=2.0, ax=ax, annot=True)
+ax.set_title('Correlation Matrix')
+Out[39]:
+Text(0.5, 1.0, 'Correlation Matrix')
+
+Splitting and Applying Algorithm
+In [40]:
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+import sklearn.metrics as sklm
+from math import sqrt
+In [41]:
+feature_col=['HomeOwnerFlag', 'YearlyIncome', 'Age',
+       'CountryRegionName_Australia', 'CountryRegionName_Canada',
+       'CountryRegionName_France', 'CountryRegionName_Germany',
+       'CountryRegionName_United Kingdom', 'CountryRegionName_United States',
+       'Education_Bachelors ', 'Education_Graduate Degree',
+       'Education_High School', 'Education_Partial College',
+       'Education_Partial High School', 'Occupation_Clerical',
+       'Occupation_Management', 'Occupation_Manual', 'Occupation_Professional',
+       'Occupation_Skilled Manual', 'Gender_F', 'Gender_M', 'MaritalStatus_M',
+       'MaritalStatus_S', 'NumberCarsOwned_>1 cars', 'NumberCarsOwned_>3 cars',
+       'NumberCarsOwned_No cars', 'NumberChildrenAtHome_More than 1',
+       'NumberChildrenAtHome_No Children', 'TotalChildren_More than 1',
+       'TotalChildren_No Children']
+predicted_class_names=['BikeBuyer']
+X=train[feature_col].values
+y=train[predicted_class_names].values 
+split_test_size=0.30
+X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=split_test_size, random_state=42)
+In [42]:
+print("{0:0.2f}% in training set".format((len(X_train)/len(train.index)) * 100))
+print("{0:0.2f}% in test set".format((len(X_test)/len(train.index)) * 100))
+70.00% in training set
+30.00% in test set
+In [43]:
+colu=['HomeOwnerFlag', 'YearlyIncome', 'Age',
+       'CountryRegionName_Australia', 'CountryRegionName_Canada',
+       'CountryRegionName_France', 'CountryRegionName_Germany',
+       'CountryRegionName_United Kingdom', 'CountryRegionName_United States',
+       'Education_Bachelors ', 'Education_Graduate Degree',
+       'Education_High School', 'Education_Partial College',
+       'Education_Partial High School', 'Occupation_Clerical',
+       'Occupation_Management', 'Occupation_Manual', 'Occupation_Professional',
+       'Occupation_Skilled Manual', 'Gender_F', 'Gender_M', 'MaritalStatus_M',
+       'MaritalStatus_S', 'NumberCarsOwned_>1 cars', 'NumberCarsOwned_>3 cars',
+       'NumberCarsOwned_No cars', 'NumberChildrenAtHome_More than 1',
+       'NumberChildrenAtHome_No Children', 'TotalChildren_More than 1',
+       'TotalChildren_No Children']
+test1=test[colu]
+In [44]:
+print(X_train.shape)
+print(test1.shape)
+(11724, 30)
+(500, 30)
+In [45]:
+from sklearn.preprocessing import StandardScaler
+ss=StandardScaler()
+X_train=ss.fit_transform(X_train)
+X_test=ss.transform(X_test)
+test1=ss.transform(test1)
+In [46]:
+reg=LogisticRegression()
+reg.fit(X_train, y_train)
+Out[46]:
+LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='warn',
+          n_jobs=None, penalty='l2', random_state=None, solver='warn',
+          tol=0.0001, verbose=0, warm_start=False)
+In [47]:
+def score_model(probs, threshold):
+    return np.array([1 if x > threshold else 0 for x in probs[:,1]])
+
+def print_metrics(labels, probs, threshold):
+    scores = score_model(probs, threshold)
+    metrics = sklm.precision_recall_fscore_support(labels, scores)
+    conf = sklm.confusion_matrix(labels, scores)
+    print('                 Confusion matrix')
+    print('                 Score positive    Score negative')
+    print('Actual positive    %6d' % conf[0,0] + '             %5d' % conf[0,1])
+    print('Actual negative    %6d' % conf[1,0] + '             %5d' % conf[1,1])
+    print('')
+    print('Accuracy        %0.2f' % sklm.accuracy_score(labels, scores))
+    print('AUC             %0.2f' % sklm.roc_auc_score(labels, probs[:,1]))
+    print('Macro precision %0.2f' % float((float(metrics[0][0]) + float(metrics[0][1]))/2.0))
+    print('Macro recall    %0.2f' % float((float(metrics[1][0]) + float(metrics[1][1]))/2.0))
+    print(' ')
+    print('           Positive      Negative')
+    print('Num case   %6d' % metrics[3][0] + '        %6d' % metrics[3][1])
+    print('Precision  %6.2f' % metrics[0][0] + '        %6.2f' % metrics[0][1])
+    print('Recall     %6.2f' % metrics[1][0] + '        %6.2f' % metrics[1][1])
+    print('F1         %6.2f' % metrics[2][0] + '        %6.2f' % metrics[2][1])
+    
+probabilities = reg.predict_proba(X_test)
+print_metrics(y_test, probabilities, 0.5)
+                 Confusion matrix
+                 Score positive    Score negative
+Actual positive      3002               385
+Actual negative       715               923
+
+Accuracy        0.78
+AUC             0.83
+Macro precision 0.76
+Macro recall    0.72
+ 
+           Positive      Negative
+Num case     3387          1638
+Precision    0.81          0.71
+Recall       0.89          0.56
+F1           0.85          0.63
+In [48]:
+solution=reg.predict(test1)
+np.savetxt('LogisticRegressionMicrosoft.csv', solution, delimiter=',')
+In [49]:
+gbr=GradientBoostingClassifier()
+gbr.fit(X_train, y_train.ravel())
+Out[49]:
+GradientBoostingClassifier(criterion='friedman_mse', init=None,
+              learning_rate=0.1, loss='deviance', max_depth=3,
+              max_features=None, max_leaf_nodes=None,
+              min_impurity_decrease=0.0, min_impurity_split=None,
+              min_samples_leaf=1, min_samples_split=2,
+              min_weight_fraction_leaf=0.0, n_estimators=100,
+              n_iter_no_change=None, presort='auto', random_state=None,
+              subsample=1.0, tol=0.0001, validation_fraction=0.1,
+              verbose=0, warm_start=False)
+In [50]:
+plt.bar(range(len(gbr.feature_importances_)), gbr.feature_importances_)
+plt.title('Feature Importance')
+plt.show()
+
+In [51]:
+probabilities = gbr.predict_proba(X_test)
+print_metrics(y_test, probabilities, 0.5)
+                 Confusion matrix
+                 Score positive    Score negative
+Actual positive      3069               318
+Actual negative       650               988
+
+Accuracy        0.81
+AUC             0.87
+Macro precision 0.79
+Macro recall    0.75
+ 
+           Positive      Negative
+Num case     3387          1638
+Precision    0.83          0.76
+Recall       0.91          0.60
+F1           0.86          0.67
+In [52]:
+solution=gbr.predict(test1)
+my_submission=pd.DataFrame({'CustomerID':test.CustomerID,'BikeBuyer': solution})
+my_submission.to_csv('GradientBoostingMicrosoft01.csv', index=False)
+In [53]:
+import xgboost as xgb
+xgb=xgb.XGBClassifier()
+xgb.fit(X_train, y_train)
+Out[53]:
+XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+       colsample_bytree=1, gamma=0, learning_rate=0.1, max_delta_step=0,
+       max_depth=3, min_child_weight=1, missing=None, n_estimators=100,
+       n_jobs=1, nthread=None, objective='binary:logistic', random_state=0,
+       reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=None,
+       silent=True, subsample=1)
+In [54]:
+plt.bar(range(len(xgb.feature_importances_)), xgb.feature_importances_)
+plt.show()
+
+In [55]:
+probabilities = xgb.predict_proba(X_test)
+print_metrics(y_test, probabilities, 0.5)
+                 Confusion matrix
+                 Score positive    Score negative
+Actual positive      3071               316
+Actual negative       657               981
+
+Accuracy        0.81
+AUC             0.87
+Macro precision 0.79
+Macro recall    0.75
+ 
+           Positive      Negative
+Num case     3387          1638
+Precision    0.82          0.76
+Recall       0.91          0.60
+F1           0.86          0.67
+In [56]:
+solution=xgb.predict(test1)
+my_submission=pd.DataFrame({'CustomerID':test.CustomerID,'BikeBuyer': solution})
+my_submission.to_csv('XgboostClassifierMicrosoft01.csv', index=False)
+In [57]:
+from sklearn.neural_network import MLPClassifier
+mlp=MLPClassifier()
+mlp.fit(X_train, y_train)
+Out[57]:
+MLPClassifier(activation='relu', alpha=0.0001, batch_size='auto', beta_1=0.9,
+       beta_2=0.999, early_stopping=False, epsilon=1e-08,
+       hidden_layer_sizes=(100,), learning_rate='constant',
+       learning_rate_init=0.001, max_iter=200, momentum=0.9,
+       n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
+       random_state=None, shuffle=True, solver='adam', tol=0.0001,
+       validation_fraction=0.1, verbose=False, warm_start=False)
+In [58]:
+probabilities = mlp.predict_proba(X_test)
+print_metrics(y_test, probabilities, 0.5)
+                 Confusion matrix
+                 Score positive    Score negative
+Actual positive      3029               358
+Actual negative       650               988
+
+Accuracy        0.80
+AUC             0.85
+Macro precision 0.78
+Macro recall    0.75
+ 
+           Positive      Negative
+Num case     3387          1638
+Precision    0.82          0.73
+Recall       0.89          0.60
+F1           0.86          0.66
+In [59]:
+solution=mlp.predict(test1)
+my_submission=pd.DataFrame({'CustomerID':test.CustomerID,'BikeBuyer': solution})
+my_submission.to_csv('NeuralNetworkClassifierMicrosoft01.csv', index=False)
+In [60]:
+rf=RandomForestClassifier()
+rf.fit(X_train, y_train)
+Out[60]:
+RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+            max_depth=None, max_features='auto', max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=None,
+            oob_score=False, random_state=None, verbose=0,
+            warm_start=False)
+In [61]:
+plt.bar(range(len(rf.feature_importances_)), rf.feature_importances_)
+plt.show()
+
+In [62]:
+probabilities = rf.predict_proba(X_test)
+print_metrics(y_test, probabilities, 0.5)
+                 Confusion matrix
+                 Score positive    Score negative
+Actual positive      2922               465
+Actual negative       705               933
+
+Accuracy        0.77
+AUC             0.80
+Macro precision 0.74
+Macro recall    0.72
+ 
+           Positive      Negative
+Num case     3387          1638
+Precision    0.81          0.67
+Recall       0.86          0.57
+F1           0.83          0.61
+In [63]:
+solution=rf.predict(test1)
+my_submission=pd.DataFrame({'CustomerID':test.CustomerID,'BikeBuyer': solution})
+my_submission.to_csv('RandomForestMicrosoft01.csv', index=False)
+In [ ]:
